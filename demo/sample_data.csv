@@ -1,0 +1,21 @@
+species_name,scientific_name,climate_zone,min_rainfall_mm,max_rainfall_mm,min_temp_c,max_temp_c,soil_type,growth_rate_m_yr,carbon_seq_tC_ha_yr,native,drought_tolerant,suitable_for_agroforestry
+Teak,Tectona grandis,tropical,1200,2500,20,35,loam,1.5,8.2,true,true,true
+Mahogany,Swietenia macrophylla,tropical,1500,3000,22,36,clay_loam,1.2,9.1,false,false,true
+Acacia,Acacia mangium,tropical,1000,3500,18,38,sandy_loam,2.5,11.4,true,true,true
+Eucalyptus,Eucalyptus pellita,tropical,1000,2500,15,40,sandy,3.0,12.0,false,true,false
+Rubber Tree,Hevea brasiliensis,tropical,1500,2500,20,35,loam,1.0,6.5,false,false,true
+Sengon,Paraserianthes falcataria,tropical,1200,3000,18,36,loam,3.5,13.2,true,false,true
+Jabon,Neolamarckia cadamba,tropical,1500,4000,22,38,clay,2.8,10.7,true,false,true
+Gmelina,Gmelina arborea,tropical,900,2800,20,40,sandy_loam,2.2,9.8,false,true,true
+Oak,Quercus robur,temperate,500,1200,5,25,loam,0.6,4.3,true,false,false
+Beech,Fagus sylvatica,temperate,600,1400,4,24,clay_loam,0.5,5.1,true,false,false
+Norway Spruce,Picea abies,boreal,400,1000,0,20,sandy_loam,0.8,6.0,true,false,false
+Scots Pine,Pinus sylvestris,boreal,300,800,-5,25,sandy,0.9,4.8,true,true,false
+Black Locust,Robinia pseudoacacia,temperate,400,900,5,30,sandy,1.1,5.5,false,true,true
+Alder,Alnus glutinosa,temperate,600,1200,3,25,clay,0.7,5.8,true,false,true
+Neem,Azadirachta indica,tropical,400,1000,20,45,sandy_loam,1.3,4.5,true,true,true
+Moringa,Moringa oleifera,tropical,300,800,18,45,sandy,1.8,3.2,false,true,true
+Bamboo (Moso),Phyllostachys edulis,subtropical,1000,2000,5,30,loam,3.0,15.0,false,false,true
+Candlenut,Aleurites moluccanus,tropical,1200,2500,20,35,clay_loam,1.4,7.6,true,false,true
+Durian,Durio zibethinus,tropical,1500,3000,22,38,loam,0.8,5.9,true,false,true
+Cacao,Theobroma cacao,tropical,1200,2500,20,35,clay_loam,0.5,4.1,false,false,true
