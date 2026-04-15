@@ -1,23 +1,27 @@
 ![Python](https://img.shields.io/badge/python-3.9%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
+![Tests](https://img.shields.io/badge/tests-60%2B%20passing-brightgreen)
 ![Last Commit](https://img.shields.io/github/last-commit/achmadnaufal/tree-species-selector)
 
 # Tree Species Selector
 
-A decision-support CLI tool that filters, scores, and ranks tree species by climate zone, soil type, rainfall tolerance, and ecological traits -- helping foresters and land-use planners choose the best candidates for reforestation and agroforestry projects.
+A decision-support library that filters, scores, and ranks tree species by
+climate zone, soil type, rainfall tolerance, and ecological traits — helping
+foresters and land-use planners choose the best candidates for reforestation
+and agroforestry projects.
 
 ---
 
 ## Features
 
-- **Multi-criteria filtering** -- narrow candidates by climate zone, rainfall range, soil type, native status, drought tolerance, and agroforestry suitability
-- **Composite suitability scoring** -- weighted index combining carbon sequestration, growth rate, native status, agroforestry fit, and drought tolerance
-- **Configurable weights** -- override default scoring weights via a config dict
-- **Immutable pipeline** -- original DataFrames are never mutated; every operation returns a new copy
-- **Input validation** -- rejects negative rainfall, invalid climate zones, and malformed data with clear error messages
-- **CSV and Excel support** -- load `.csv`, `.xlsx`, or `.xls` files
-- **20-species demo dataset** -- realistic tropical, subtropical, temperate, and boreal species included
-- **32 pytest tests** -- full coverage of filtering, scoring, ranking, and edge cases
+- **Multi-criteria filtering** — narrow candidates by climate zone, rainfall range, soil type, native status, drought tolerance, and agroforestry suitability
+- **Composite suitability scoring** — weighted index combining carbon sequestration, growth rate, native status, agroforestry fit, and drought tolerance
+- **Configurable weights** — override default scoring weights via a config dict
+- **Immutable pipeline** — original DataFrames are never mutated; every operation returns a new copy
+- **Input validation** — rejects negative rainfall, invalid climate zones, and malformed data with clear error messages
+- **CSV and Excel support** — load `.csv`, `.xlsx`, or `.xls` files
+- **30-species demo dataset** — realistic tropical, subtropical, temperate, and boreal species with Indonesian/tropical reforestation context
+- **60+ pytest tests** — full coverage of filtering, scoring, ranking, edge cases, and the data generator
 
 ---
 
@@ -26,7 +30,7 @@ A decision-support CLI tool that filters, scores, and ranks tree species by clim
 ```bash
 git clone https://github.com/achmadnaufal/tree-species-selector.git
 cd tree-species-selector
-python -m venv .venv && source .venv/bin/activate
+python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
@@ -74,49 +78,79 @@ ranked = selector.rank(tropical, top_n=5)
 print(ranked[["rank", "species_name", "suitability_score", "growth_rate_m_yr", "carbon_seq_tc_ha_yr"]])
 ```
 
-### Sample output (real)
+### 4. Customise scoring weights
+
+```python
+selector = SpeciesSelector(
+    config={
+        "score_weights": {
+            "carbon":       0.50,   # prioritise carbon sequestration
+            "growth":       0.30,
+            "native":       0.10,
+            "agroforestry": 0.05,
+            "drought":      0.05,
+        }
+    }
+)
+ranked = selector.rank(df, top_n=5)
+```
+
+### 5. Full analysis pipeline
+
+```python
+result = selector.run("demo/sample_data.csv")
+print(f"Total records: {result['total_records']}")
+print("Column means:", result.get("means"))
+```
+
+---
+
+## Sample Output
 
 ```
 === Load Dataset ===
-Loaded 20 species from demo/sample_data.csv
+Loaded 30 species from demo/sample_data.csv
 
 === Filter: Tropical + Loam Soil + Rainfall 1200-2500 mm ===
-species_name climate_zone soil_type  growth_rate_m_yr
-        Teak     tropical      loam               1.5
- Rubber Tree     tropical      loam               1.0
-      Sengon     tropical      loam               3.5
-      Durian     tropical      loam               0.8
+     species_name climate_zone soil_type  growth_rate_m_yr
+             Teak     tropical      loam               1.5
+      Rubber Tree     tropical      loam               1.0
+           Sengon     tropical      loam               3.5
+           Durian     tropical      loam               0.8
+        Jackfruit     tropical      loam               1.1
+         Albizzia     tropical      loam               2.0
 
-=== Rank Top 5 Tropical Species ===
- rank species_name  suitability_score  growth_rate_m_yr  carbon_seq_tc_ha_yr
-    1       Sengon               95.0               3.5                 13.2
-    2       Acacia               82.8               2.5                 11.4
-    3        Jabon               78.0               2.8                 10.7
-    4   Eucalyptus               65.2               3.0                 12.0
-    5         Teak               60.0               1.5                  8.2
-
-=== Full Pipeline Analysis ===
-Total records: 20
-Columns: ['species_name', 'scientific_name', 'climate_zone', 'min_rainfall_mm',
-          'max_rainfall_mm', 'min_temp_c', 'max_temp_c', 'soil_type',
-          'growth_rate_m_yr', 'carbon_seq_tc_ha_yr', 'native',
-          'drought_tolerant', 'suitable_for_agroforestry']
+=== Top 5 Tropical Species by Suitability ===
+ rank         species_name  suitability_score  growth_rate_m_yr  carbon_seq_tc_ha_yr
+    1  Bamboo (Petung)               100.0               4.0                 16.5
+    2  Bamboo (Moso)                  97.8               3.0                 15.0
+    3         Sengon                  85.3               3.5                 13.2
+    4         Acacia                  74.1               2.5                 11.4
+    5          Jabon                  68.9               2.8                 10.7
 ```
 
-### Running tests
+---
+
+## Running Tests
 
 ```bash
+# Run all tests with verbose output
 pytest tests/ -v
+
+# Run with coverage report
+pytest tests/ -v --cov=src --cov-report=term-missing
 ```
+
+Expected output:
 
 ```
 tests/test_selector.py::TestFilterByClimateZone::test_tropical_returns_only_tropical_species PASSED
 tests/test_selector.py::TestFilterByClimateZone::test_boreal_returns_only_boreal_species PASSED
-tests/test_selector.py::TestFilterByClimateZone::test_climate_zone_is_case_insensitive PASSED
-tests/test_selector.py::TestFilterByClimateZone::test_invalid_climate_zone_raises_value_error PASSED
-tests/test_selector.py::TestFilterByRainfall::test_min_rainfall_excludes_low_max_rainfall_species PASSED
 ...
-============================== 32 passed in 0.22s ==============================
+tests/test_data_generator.py::TestGenerateSample::test_returns_dataframe PASSED
+tests/test_data_generator.py::TestGenerateDomainSample::test_required_columns_present PASSED
+...
+============================== 60+ passed in 0.35s ==============================
 ```
 
 ---
@@ -129,6 +163,7 @@ tests/test_selector.py::TestFilterByRainfall::test_min_rainfall_excludes_low_max
 | **pandas** | Data loading, filtering, and transformation |
 | **NumPy** | Numeric normalization for scoring |
 | **pytest** | Unit and integration testing |
+| **pytest-cov** | Test coverage reporting |
 | **Rich** | (available) Terminal formatting |
 | **openpyxl** | Excel file support |
 
@@ -154,12 +189,12 @@ flowchart LR
 
 ### Data flow
 
-1. **Load** -- `load_data()` reads CSV or Excel into a raw pandas DataFrame.
-2. **Validate** -- `validate()` checks for empty data, negative rainfall, and min/max consistency.
-3. **Preprocess** -- `preprocess()` normalizes column names, strips whitespace, converts boolean strings, and lowercases categorical fields. Returns a new DataFrame (immutable).
-4. **Filter** -- `filter()` applies AND-combined environmental criteria (climate zone, rainfall range, soil type, native, drought-tolerant, agroforestry). Returns a new subset.
-5. **Score** -- `score()` computes a 0-100 composite suitability score using configurable weights across carbon sequestration (40%), growth rate (30%), native status (15%), agroforestry suitability (10%), and drought tolerance (5%).
-6. **Rank** -- `rank()` sorts by score descending, adds a rank column, and optionally truncates to `top_n`.
+1. **Load** — `load_data()` reads CSV or Excel into a raw pandas DataFrame.
+2. **Validate** — `validate()` checks for empty data, negative rainfall, and min/max consistency.
+3. **Preprocess** — `preprocess()` normalizes column names, strips whitespace, converts boolean strings, and lowercases categorical fields. Returns a new DataFrame (immutable).
+4. **Filter** — `filter()` applies AND-combined environmental criteria (climate zone, rainfall range, soil type, native, drought-tolerant, agroforestry). Returns a new subset.
+5. **Score** — `score()` computes a 0-100 composite suitability score using configurable weights across carbon sequestration (40%), growth rate (30%), native status (15%), agroforestry suitability (10%), and drought tolerance (5%).
+6. **Rank** — `rank()` sorts by score descending, adds a rank column, and optionally truncates to `top_n`.
 
 ---
 
@@ -168,19 +203,20 @@ flowchart LR
 ```
 tree-species-selector/
 ├── src/
-│   ├── __init__.py
-│   ├── main.py              # SpeciesSelector core class
-│   └── data_generator.py    # Programmatic sample data generator
+│   ├── __init__.py              # Public API exports
+│   ├── main.py                  # SpeciesSelector core class
+│   └── data_generator.py        # Sample data generators (legacy + domain-aligned)
 ├── demo/
-│   └── sample_data.csv      # 20-row realistic species dataset
+│   └── sample_data.csv          # 30-row realistic species dataset
 ├── sample_data/
-│   └── sample_data.csv      # Lightweight sample for quick testing
+│   └── sample_data.csv          # Lightweight sample for quick testing
 ├── tests/
 │   ├── __init__.py
-│   └── test_selector.py     # 32 pytest assertions
+│   ├── test_selector.py         # 50+ assertions for SpeciesSelector
+│   └── test_data_generator.py   # 15+ assertions for data generator
 ├── examples/
-│   └── basic_usage.py       # Runnable usage example
-├── data/                    # Drop your own data files here (gitignored)
+│   └── basic_usage.py           # Runnable usage example
+├── data/                        # Drop your own data files here (gitignored)
 ├── .gitignore
 ├── CHANGELOG.md
 ├── LICENSE
