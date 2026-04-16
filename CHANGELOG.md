@@ -1,5 +1,32 @@
 # Changelog
 
+## [Unreleased] - 2026-04-17
+### Added
+- `src/species_diversity_scorer.py` — new module that computes ecological and
+  functional diversity indices for a proposed planting plan:
+  - **Shannon entropy H'** (nats) — quantifies species richness weighted by
+    abundance.
+  - **Simpson diversity D** (0–1) — probability that two randomly drawn
+    individuals belong to different species.
+  - **Pielou's evenness J'** (0–1) — how uniformly proportions are
+    distributed across species.
+  - **Functional diversity** — mean pairwise Euclidean distance between
+    species in normalised trait space (growth rate, carbon sequestration,
+    rainfall tolerance, temperature range).
+  - `compute_diversity()` — returns an immutable `DiversityResult` dataclass.
+  - `score_plan_diversity()` — convenience wrapper returning a one-row pandas
+    DataFrame for pipeline integration.
+  - Full input validation (empty DataFrame, missing column, negative
+    proportions, all-zero proportions) with clear error messages.
+  - Immutable design: all functions return new objects; no input is mutated.
+- `tests/test_species_diversity_scorer.py` — 31 pytest assertions covering
+  happy paths, edge cases (single species, missing traits, zero proportions,
+  custom column names), determinism, parametrized Shannon known-values, and
+  `score_plan_diversity` integration.
+- README section "New: Species Diversity Scorer" with five step-by-step usage
+  examples (basic, index inspection, tidy DataFrame, scenario comparison,
+  custom column and traits).
+
 ## [0.2.0] - 2026-04-16
 ### Added
 - Unit tests with pytest covering SpeciesSelector (filter, score, rank, validate,

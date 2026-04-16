@@ -105,6 +105,91 @@ print("Column means:", result.get("means"))
 
 ---
 
+## New: Species Diversity Scorer
+
+Evaluate the ecological richness of any proposed planting plan using
+Shannon entropy, Simpson diversity, Pielou's evenness, and functional
+diversity (mean pairwise trait distance).
+
+### Step-by-step usage
+
+**1. Build your planting-plan DataFrame**
+
+Each row represents one species.  The `proportion` column holds any
+non-negative numeric value (percentages, hectares, counts) — the scorer
+normalises internally.
+
+```python
+import pandas as pd
+from src.species_diversity_scorer import compute_diversity, score_plan_diversity
+
+plan = pd.DataFrame({
+    "species_name":        ["Teak",  "Sengon", "Albizzia", "Jabon"],
+    "proportion":          [0.40,    0.30,     0.20,       0.10],
+    "growth_rate_m_yr":    [1.5,     3.5,      2.0,        2.8],
+    "carbon_seq_tc_ha_yr": [8.2,     13.2,     7.5,        10.7],
+    "min_rainfall_mm":     [1200,    800,      900,        1000],
+    "max_rainfall_mm":     [2500,    3000,     2800,       2600],
+    "min_temp_c":          [20,      18,       18,         20],
+    "max_temp_c":          [35,      38,       36,         36],
+})
+```
+
+**2. Compute all diversity indices at once**
+
+```python
+result = compute_diversity(plan)
+print(result.summary)
+# Species: 4 | Shannon H' = 1.279 | Simpson D = 0.700 | Evenness J' = 0.922 | Functional diversity = 0.384
+```
+
+**3. Inspect individual indices**
+
+```python
+print(f"Shannon H'  = {result.shannon_index:.3f}")   # nats; higher = more diverse
+print(f"Simpson D   = {result.simpson_index:.3f}")   # 0–1; closer to 1 = more diverse
+print(f"Evenness J' = {result.evenness:.3f}")         # 0–1; 1 = perfectly even
+print(f"Functional diversity = {result.functional_diversity:.3f}")
+```
+
+**4. Get a tidy one-row DataFrame for pipelines**
+
+```python
+df = score_plan_diversity(plan)
+print(df.to_string(index=False))
+#  species_count  shannon_index  simpson_index  evenness  functional_diversity
+#              4        1.27931        0.70000   0.92254               0.38400
+```
+
+**5. Compare two planting scenarios**
+
+```python
+from src.species_diversity_scorer import score_plan_diversity
+
+monoculture = pd.DataFrame({"species_name": ["Teak"], "proportion": [1.0]})
+mixed       = plan  # four-species plan from above
+
+comparison = pd.concat(
+    [score_plan_diversity(monoculture).assign(scenario="monoculture"),
+     score_plan_diversity(mixed).assign(scenario="mixed")],
+    ignore_index=True,
+)
+print(comparison[["scenario", "shannon_index", "simpson_index", "evenness"]])
+```
+
+**Custom proportion column and traits**
+
+```python
+# If your column is named "area_ha" and you only care about growth and carbon:
+result = compute_diversity(
+    plan.rename(columns={"proportion": "area_ha"}),
+    proportion_col="area_ha",
+    trait_columns=("growth_rate_m_yr", "carbon_seq_tc_ha_yr"),
+)
+```
+
+---
+
 ## Sample Output
 
 ```
