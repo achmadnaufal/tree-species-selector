@@ -190,6 +190,91 @@ result = compute_diversity(
 
 ---
 
+## New: Site-Match Scorer
+
+The composite suitability score in `SpeciesSelector.score()` ranks species
+relative to one another based on traits (carbon, growth, native, etc.) but
+ignores the *target site*.  The new **site-match scorer** answers a
+different, complementary question:
+
+> Given a specific site (rainfall, temperature, soil), how well does each
+> candidate species fit?
+
+### Quick Start
+
+```python
+import pandas as pd
+from src.site_match_scorer import Site, recommend_for_site
+
+selector_df = pd.read_csv("demo/sample_data.csv")
+
+site = Site(
+    rainfall_mm=1800,
+    temperature_c=27,
+    soil_type="loam",
+    name="West Java reforestation block",
+)
+
+top5 = recommend_for_site(selector_df, site, top_n=5)
+print(top5[["rank", "species_name", "site_match_score",
+            "rainfall_match", "temperature_match", "soil_match"]])
+```
+
+### Step-by-step usage
+
+**1. Describe the planting site**
+
+```python
+from src.site_match_scorer import Site
+
+site = Site(rainfall_mm=1800, temperature_c=27, soil_type="loam")
+```
+
+`Site` is an immutable dataclass; invalid soil types or negative rainfall
+raise `ValueError` immediately.
+
+**2. Score every species against the site**
+
+```python
+from src.site_match_scorer import score_site_match
+
+scored = score_site_match(selector_df, site)
+print(scored[["species_name", "rainfall_match", "temperature_match",
+              "soil_match", "site_match_score"]].head())
+```
+
+Each sub-score is in `[0, 1]`:
+
+- `rainfall_match` – 1.0 inside `[min_rainfall_mm, max_rainfall_mm]`,
+  decays linearly over a 500 mm tolerance margin (configurable).
+- `temperature_match` – analogous to rainfall over a 5 deg C margin.
+- `soil_match` – 1.0 exact, 0.5 for compatible soils (e.g. loam vs
+  clay_loam), 0.0 unrelated.
+
+**3. Customise tolerances and weights**
+
+```python
+strict = score_site_match(
+    selector_df,
+    site,
+    rainfall_tolerance_mm=200,   # tighter rainfall tolerance
+    temp_tolerance_c=2.0,
+    soil_partial_score=0.25,     # penalise soil mismatches more
+    weights={"rainfall": 0.5, "temperature": 0.3, "soil": 0.2},
+)
+```
+
+**4. Get a ranked top-N recommendation**
+
+```python
+top3 = recommend_for_site(selector_df, site, top_n=3, min_score=0.6)
+```
+
+Returns at most 3 species sorted by `site_match_score` desc, dropping any
+species whose composite match score is below `min_score`.
+
+---
+
 ## Sample Output
 
 ```

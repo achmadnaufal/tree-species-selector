@@ -1,5 +1,38 @@
 # Changelog
 
+## [Unreleased] - 2026-04-18
+### Added
+- `src/site_match_scorer.py` — new module that evaluates how well each
+  candidate species fits a *given site* (rainfall, temperature, soil), as a
+  complement to the trait-based suitability score in `SpeciesSelector`:
+  - **`Site` dataclass** — immutable description of a planting location with
+    input validation (negative rainfall and unknown soil types are rejected
+    on construction).
+  - **`score_site_match()`** — returns a copy of the species DataFrame with
+    `rainfall_match`, `temperature_match`, `soil_match`, and the composite
+    `site_match_score` columns, each in `[0, 1]`.
+  - **`recommend_for_site()`** — convenience top-N ranker with a
+    `min_score` threshold and added `rank` column.
+  - Configurable rainfall/temperature tolerance margins, partial soil-match
+    score, and sub-score weights.
+  - Soil-compatibility groups (e.g. loam ↔ clay_loam ↔ sandy_loam) for
+    partial soil matches.
+  - Comprehensive input validation (empty DataFrame, missing required
+    columns, non-positive tolerances, out-of-range partial score, negative
+    or all-zero weights) with clear error messages.
+  - Fully immutable: every function returns new objects; no input is mutated.
+- `tests/test_site_match_scorer.py` — 30+ pytest assertions covering the
+  `Site` dataclass, happy paths, envelope decay (linear and zero-clamped),
+  boundary values, exact / compatible / unrelated soil matches, custom
+  weights, input validation errors, immutability, determinism, and the
+  `recommend_for_site` wrapper (top-N ordering, rank column, min-score
+  filter, invalid arguments).
+- README section "New: Site-Match Scorer" with a runnable Quick Start and
+  step-by-step usage (describe site, score, customise tolerances/weights,
+  ranked recommendation).
+- `src/__init__.py` exports updated to include `Site`, `score_site_match`,
+  and `recommend_for_site`.
+
 ## [Unreleased] - 2026-04-17
 ### Added
 - `src/species_diversity_scorer.py` — new module that computes ecological and
