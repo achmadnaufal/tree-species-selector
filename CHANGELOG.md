@@ -1,6 +1,44 @@
 # Changelog
 
-## [Unreleased] - 2026-04-18
+All notable changes to this project are documented here.  This project
+adheres to [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
+[Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased] - 2026-04-19
+### Added
+- `src/portfolio_builder.py` -- new module that composes an optimal
+  site-matched, diversity-aware species portfolio:
+  - **`build_portfolio()`** -- greedy selector that seeds on the best
+    site-match species and iteratively adds candidates maximising
+    `alpha * site_fit + (1 - alpha) * functional_distance`, assigning
+    proportions proportionally to the final objective.
+  - **`compare_portfolios()`** -- sensitivity helper that runs
+    `build_portfolio` across several `alpha` values and returns a tidy
+    comparison DataFrame.
+  - **`PortfolioResult`** -- immutable dataclass carrying the portfolio,
+    site, alpha, weighted mean site-fit, and a human-readable summary.
+  - Proportions always sum to 1.0; empty-pool and zero-objective cases
+    fall back gracefully (empty portfolio with informative summary,
+    equal-split proportions, respectively).
+  - Configurable `portfolio_size`, `alpha`, `min_site_score`,
+    `trait_columns`, and pass-through `site_match_kwargs`.
+  - Comprehensive input validation (non-DataFrame, empty, non-positive
+    sizes, out-of-range alpha / min_site_score) with clear messages.
+  - Fully immutable: input DataFrame is never mutated, every function
+    returns a new object.
+- `tests/test_portfolio_builder.py` -- 38 pytest assertions covering
+  happy paths, alpha-sweep behaviour (alpha=1 pure ranking, alpha=0
+  diversity prevalence), input validation, no-match / single-candidate
+  edge cases, missing-trait fallback, immutability, determinism, and
+  the `compare_portfolios` helper.
+- `README.md` restructured with the requested sections (Overview,
+  Installation, Quick Start, Step-by-Step Usage, Selection Methodology,
+  Species Database, License) and a new "Build a diverse species
+  portfolio" step.
+- `src/__init__.py` exports updated to include `build_portfolio`,
+  `compare_portfolios`, and `PortfolioResult`.
+
+## [0.3.0] - 2026-04-18
 ### Added
 - `src/site_match_scorer.py` — new module that evaluates how well each
   candidate species fits a *given site* (rainfall, temperature, soil), as a

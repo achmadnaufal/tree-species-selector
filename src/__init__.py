@@ -18,11 +18,18 @@ Public API
   against a given site (rainfall, temperature, soil).
 - :func:`~src.site_match_scorer.recommend_for_site` -- top-N species ranked
   by site match.
+- :func:`~src.portfolio_builder.build_portfolio` -- build a diverse
+  site-matched species portfolio with assigned proportions.
+- :func:`~src.portfolio_builder.compare_portfolios` -- sensitivity analysis
+  across fit-vs-diversity weights.
+- :class:`~src.portfolio_builder.PortfolioResult` -- immutable result
+  container returned by :func:`build_portfolio`.
 """
 
 from src.main import VALID_CLIMATE_ZONES, VALID_SOIL_TYPES, SpeciesSelector
 from src.data_generator import generate_domain_sample, generate_sample
 from src.site_match_scorer import Site, recommend_for_site, score_site_match
+from src.portfolio_builder import PortfolioResult, build_portfolio, compare_portfolios
 
 __all__ = [
     "SpeciesSelector",
@@ -33,4 +40,7 @@ __all__ = [
     "Site",
     "score_site_match",
     "recommend_for_site",
+    "PortfolioResult",
+    "build_portfolio",
+    "compare_portfolios",
 ]
