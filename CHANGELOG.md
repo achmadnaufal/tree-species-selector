@@ -4,6 +4,17 @@ All notable changes to this project are documented here.  This project
 adheres to [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-04-21
+### Added
+- `src/climate_envelope.py` - bioclimatic envelope matcher using WorldClim BIO variables (BIO1, BIO5, BIO6, BIO12, BIO14, BIO17)
+- `BioclimRange`, `SpeciesEnvelope`, `EnvelopeMatchResult` immutable dataclasses
+- `ClimateEnvelopeMatcher` with configurable per-variable weights, site validation, and ranked recommendations
+- `widen_envelope()` helper for climate-change buffer modelling
+- `categorise_score()` returning excellent / good / marginal / unsuitable labels
+- `sample_data/climate_envelope_samples.csv` - 20-species envelope dataset (tropical SE Asia + Latin America)
+- 44 pytest tests covering ranges, envelopes, matcher, ranking, loading, and helpers
+- README section with runnable snippet for the new bioclimatic module
+
 ## [Unreleased] - 2026-04-19
 ### Added
 - `src/portfolio_builder.py` -- new module that composes an optimal

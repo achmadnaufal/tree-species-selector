@@ -19,12 +19,13 @@ Picking the right species for a reforestation site is a multi-criteria
 problem: candidates must survive the local climate and soil, deliver on
 project goals (carbon, timber, livelihoods, ecosystem services), and
 ideally form a mixed, ecologically diverse plantation rather than a
-monoculture. This library provides four composable building blocks:
+monoculture. This library provides five composable building blocks:
 
 | Module | What it answers |
 |---|---|
 | `SpeciesSelector` (`src/main.py`) | *Which candidates survive my constraints, and how do they rank by traits?* |
 | `site_match_scorer` | *Given a specific site (rainfall / temperature / soil), how well does each candidate fit?* |
+| `climate_envelope` | *How well does each species fit a site's full WorldClim BIO envelope (BIO1/5/6/12/14/17)?* |
 | `species_diversity_scorer` | *How diverse is my proposed planting plan (Shannon, Simpson, evenness, functional diversity)?* |
 | `portfolio_builder` | *Which optimal **mix** of species should I plant at this site and in what proportions?* |
 
@@ -38,11 +39,12 @@ validates its arguments at the system boundary and raises clear
 - **Multi-criteria filtering** -- climate zone, rainfall range, soil type, native status, drought tolerance, agroforestry suitability
 - **Composite suitability scoring** -- weighted index over carbon sequestration, growth rate, native status, agroforestry fit, drought tolerance; weights are configurable
 - **Site-match scoring** -- rainfall / temperature envelope decay, soil-compatibility groups (e.g. loam and clay_loam partially compatible)
+- **Bioclimatic envelope matching (NEW)** -- BIOCLIM-style ranking against the six WorldClim BIO variables with excellent/good/marginal/unsuitable categories
 - **Diversity indices** -- Shannon H', Simpson D, Pielou's evenness, mean pairwise trait distance
-- **Portfolio builder (NEW)** -- greedy diversity-aware optimisation that returns a small set of species with assigned proportions summing to 1.0
+- **Portfolio builder** -- greedy diversity-aware optimisation that returns a small set of species with assigned proportions summing to 1.0
 - **CSV and Excel I/O** -- `.csv`, `.xlsx`, `.xls`
 - **30-row realistic demo dataset** -- tropical, subtropical, temperate, boreal, and arid species relevant to Indonesian / SE-Asian reforestation contexts
-- **200+ pytest tests** -- unit, integration, parametrized, and edge-case coverage
+- **240+ pytest tests** -- unit, integration, parametrized, and edge-case coverage
 
 ---
 
@@ -168,7 +170,44 @@ comparison = compare_portfolios(df, site, alphas=[0.0, 0.3, 0.6, 1.0])
 print(comparison)
 ```
 
-### 7. Evaluate ecological diversity of any plan
+### 7. Bioclimatic envelope matching (WorldClim BIO variables)
+
+Match a planting site's climate (annual mean temperature, warmest/coldest month,
+annual precipitation, driest month/quarter) to each species' known tolerance
+envelope and rank by composite match score.
+
+```python
+from src.climate_envelope import ClimateEnvelopeMatcher
+
+matcher = ClimateEnvelopeMatcher()
+envelopes = matcher.load_envelopes("sample_data/climate_envelope_samples.csv")
+
+# A tropical site in Sumatra: warm, humid, ~2100 mm/yr rainfall
+site = {
+    "bio1": 26.5,   # annual mean temperature (C)
+    "bio5": 33.0,   # max temp of warmest month (C)
+    "bio6": 21.0,   # min temp of coldest month (C)
+    "bio12": 2100,  # annual precipitation (mm)
+    "bio14": 45,    # precipitation of driest month (mm)
+    "bio17": 180,   # precipitation of driest quarter (mm)
+}
+
+ranked = matcher.rank_species(site, envelopes, top_n=5)
+for r in ranked:
+    print(f"{r.species_name:20s}  {r.match_score:6.2f}  {r.category}")
+```
+
+Example output:
+
+```
+Teak                  100.00  excellent
+Sengon                  95.50  excellent
+Mahogany                88.75  excellent
+Rubber Tree             86.00  excellent
+Jabon                   85.25  excellent
+```
+
+### 8. Evaluate ecological diversity of any plan
 
 ```python
 import pandas as pd
@@ -185,7 +224,7 @@ print(result.summary)
 # Species: 4 | Shannon H' = 1.279 | Simpson D = 0.700 | ...
 ```
 
-### 8. Run the full pipeline on a CSV
+### 9. Run the full pipeline on a CSV
 
 ```python
 result = selector.run("demo/sample_data.csv")

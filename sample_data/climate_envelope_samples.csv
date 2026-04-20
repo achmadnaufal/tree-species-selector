@@ -1,0 +1,21 @@
+species_name,scientific_name,bio1_low,bio1_high,bio5_low,bio5_high,bio6_low,bio6_high,bio12_low,bio12_high,bio14_low,bio14_high,bio17_low,bio17_high
+Teak,Tectona grandis,22.0,28.0,30.0,40.0,13.0,24.0,1200,2500,20,120,80,350
+Sengon,Paraserianthes falcataria,22.0,29.0,29.0,36.0,18.0,24.0,1500,4500,40,220,150,600
+Mahogany,Swietenia macrophylla,22.0,28.0,28.0,36.0,18.0,24.0,1500,3500,50,250,180,700
+Rubber Tree,Hevea brasiliensis,22.0,29.0,28.0,36.0,18.0,24.0,1800,3500,60,260,200,700
+Gmelina,Gmelina arborea,21.0,28.0,29.0,38.0,13.0,24.0,900,2800,20,200,80,550
+Acacia mangium,Acacia mangium,22.0,29.0,29.0,36.0,15.0,24.0,1000,3500,30,200,100,600
+Eucalyptus pellita,Eucalyptus pellita,21.0,29.0,29.0,38.0,13.0,24.0,900,2800,20,180,80,500
+Jabon,Neolamarckia cadamba,22.0,28.0,29.0,36.0,18.0,24.0,1500,3500,40,220,150,650
+Neem,Azadirachta indica,22.0,32.0,32.0,45.0,8.0,24.0,400,1200,0,40,10,120
+Moringa,Moringa oleifera,22.0,32.0,32.0,45.0,10.0,24.0,300,1500,0,50,10,150
+Cacao,Theobroma cacao,22.0,28.0,28.0,34.0,18.0,24.0,1500,3000,60,200,200,600
+Coffee Arabica,Coffea arabica,15.0,24.0,22.0,30.0,10.0,18.0,1200,2200,30,150,100,450
+Brazil Nut,Bertholletia excelsa,22.0,28.0,28.0,34.0,18.0,24.0,1600,3000,60,200,200,650
+Ipe,Handroanthus impetiginosus,18.0,28.0,26.0,38.0,8.0,22.0,700,2200,10,120,40,400
+Cedro,Cedrela odorata,20.0,28.0,27.0,36.0,13.0,24.0,1200,3000,40,220,150,650
+Balsa,Ochroma pyramidale,22.0,28.0,28.0,34.0,18.0,24.0,1500,3500,50,250,180,700
+Guanacaste,Enterolobium cyclocarpum,22.0,30.0,30.0,38.0,15.0,24.0,700,2500,10,120,40,400
+Pink Cedar,Acrocarpus fraxinifolius,18.0,28.0,26.0,36.0,10.0,22.0,900,2800,20,180,80,550
+Durian,Durio zibethinus,24.0,30.0,30.0,36.0,20.0,24.0,1500,3500,80,300,250,800
+Bamboo Moso,Phyllostachys edulis,12.0,22.0,22.0,32.0,2.0,12.0,1000,2000,20,120,80,400
